@@ -1,0 +1,8 @@
+Hey Dave,
+
+Now this server is publically I have removed the backups from this folder.
+I also gave you some new credentials for the app.
+dave:SecurePassword_2024!
+Remove this file once you have used these credentials
+
+George
