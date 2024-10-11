@@ -1,0 +1,58 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Society Bank - Account</title>
+    <!-- Use tailwind -->
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/tailwindcss/2.0.3/tailwind.min.css">
+</head>
+<body>
+    <h1 class="text-center text-3xl font-bold mt-10">Society Bank</h1>
+    <h2 class="text-center text-xl mt-5">Your Account</h2>
+    <h3 class="text-center text-lg mt-5">Welcome, <span class="font-bold" id="username">John Doe</span></h3>
+    <div class="flex justify-center mt-10">
+        <a href="deposit.html" class="bg-blue-500 hover:bg-blue-700 text-white font-bold py-2 px-4 rounded mr-5">Deposit</a>
+        <a href="withdraw.html" class="bg-blue-500 hover:bg-blue-700 text-white font-bold py-2 px-4 rounded">Withdraw</a>
+    </div>
+    <!-- Get /account-details -->
+    <div class="w-1/3 mx-auto mt-10">
+        <h3 class="text-center text-xl font-bold">Account Details</h3>
+        <div class="mt-5">
+            <p class="text-sm">Account Number: <span class="font-bold" id="account_number">1234567890</span></p>
+            <p class="text-sm">Balance: <span class="font-bold" id="balance">1000</span></p>
+            <table class="w-full mt-5">
+                <thead>
+                    <tr>
+                        <th class="border border-gray-300">Date</th>
+                        <th class="border border-gray-300">Amount</th>
+                        <th class="border border-gray-300">Message</th>
+                    </tr>
+                </thead>
+                <tbody id="transactions">
+                    <!-- Transactions will be displayed here -->
+                </tbody>
+        </div>
+    </div>
+
+    <script>
+        // Get account details
+        fetch('/account-details')
+            .then(response => response.json())
+            .then(data => {
+                document.querySelector('#username').textContent = data.account.username;
+                document.querySelector('#account_number').textContent = data.account.account_number;
+                document.querySelector('#balance').textContent = data.account.balance;
+                for (let transaction of data.transactions) {
+                    let tr = document.createElement('tr');
+                    tr.innerHTML = `
+                        <td class="border border-gray-300">${transaction.timestamp}</td>
+                        <td class="border border-gray-300">${transaction.amount}</td>
+                        <td class="border border-gray-300">${transaction.message}</td>
+                    `;
+                    document.querySelector('#transactions').appendChild(tr);
+                }
+            });
+    </script>
+</body>
+</html>
