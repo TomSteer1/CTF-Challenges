@@ -1,0 +1,51 @@
+name: Build on issue closure
+on:
+  issues:
+    types: [ closed ]
+
+permissions:
+  contents: write
+
+jobs:
+  build:
+    runs-on: ubuntu-latest
+
+    steps:
+    - name: Checkout
+      uses: actions/checkout@v4
+
+    - name: Create netrc credentals
+      env:
+        GITHUB_TOKEN: ${{ secrets.token }}
+      run: |
+        echo "machine github.com login x-oauth-basic password $GITHUB_TOKEN" > ~/.netrc
+        chmod 600 ~/.netrc
+
+    - name: Compile Program
+      run: |
+        export GOPRIVATE=github.com/goose-ctf/helpers-hash-username
+        go get github.com/goose-ctf/helpers-hash-username
+        go mod tidy
+        rm ~/.netrc
+        go build .
+
+    - name: Create Release
+      uses: actions/create-release@v1
+      id: create_release
+      env:
+        GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }} # This token is provided by Actions, you do not need to create your own token
+      with:
+        tag_name: release-${{ github.run_id }}-${{ github.run_attempt }}
+        release_name: release-${{ github.run_id }}-${{ github.run_attempt }}
+        draft: false
+        prerelease: false
+    - name: Upload Release Asset
+      id: upload-release-asset
+      uses: actions/upload-release-asset@v1
+      env:
+        GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+      with:
+        upload_url: ${{ steps.create_release.outputs.upload_url }} # This pulls from the CREATE RELEASE step above, referencing it's ID to get its outputs object, which include a `upload_url`. See this blog post for more info: https://jasonet.co/posts/new-features-of-github-actions/#passing-data-to-future-steps 
+        asset_path: ./panel
+        asset_name: panel
+        asset_content_type: application/octet-stream
